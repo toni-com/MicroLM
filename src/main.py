@@ -1,5 +1,8 @@
-from data.micro_dataset import get_micro_dataset, get_micro_transformer, micro_transform
-from torch.utils.data import TensorDataset
+from data.micro_dataset import (
+    get_micro_dataset,
+    get_micro_transformer,
+    micro_transform,
+)
 
 
 def main() -> None:

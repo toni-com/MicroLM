@@ -12,6 +12,6 @@ venv/
 env/
 
 # Data
-data/
+src/data/
 dataset/
 raw_data/
