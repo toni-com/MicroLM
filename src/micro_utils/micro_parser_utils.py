@@ -9,6 +9,8 @@ def read_args():
     parser.add_argument("--block_size", required=False, type=int, default=32, help="Block size.")
     parser.add_argument("--hidden_size", required=False, type=int, default=128, help="Hidden size.")
     parser.add_argument("--embedding_size", required=False, type=int, default=10, help="Embedding size.")
+    parser.add_argument("--save", required=False, type=bool, default=True, help="Save model.")
+    parser.add_argument("--test_run", required=False, type=bool, default=False, help="Test run.")
 
     args = parser.parse_args()
 
@@ -19,4 +21,6 @@ def read_args():
         args.block_size,
         args.hidden_size,
         args.embedding_size,
+        args.save,
+        args.test_run,
     )
