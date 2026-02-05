@@ -11,6 +11,7 @@ from micro_data_utils.micro_dataset import (
 from micro_utils.micro_parser_utils import read_args
 from engine.train import train
 from micro_model.micro_model import MicroModel
+from micro_utils.micro_save_utils import save_model
 
 
 def main() -> None:
@@ -31,7 +32,7 @@ def main() -> None:
 
     # initialize micro_data_utils
     full_data = get_micro_dataset()
-    full_data = full_data[0 : int(len(full_data) * 0.3)]
+    # full_data = full_data[0 : int(len(full_data) * 0.2)]
     stoi, itos = get_micro_transformer(full_data)
 
     X_train, y_train, X_val, y_val, X_test, y_test = micro_transform_and_split_data(
@@ -68,10 +69,14 @@ def main() -> None:
         scheduler=scheduler,
         loss_fn=loss_fn,
         device=device,
+        use_tqdm=True,
     )
 
     print(f"Average training loss: {sum(train_loss) / len(train_loss):.3f}")
     print(f"Average val loss: {sum(val_loss) / len(val_loss):.3f}")
+
+    save_model(model=micro_model)
+    print(f"Model saved.")
 
 
 if __name__ == "__main__":

@@ -63,17 +63,11 @@ def micro_transform_and_split_data(
     val_indices = int(train_indices + total_length * val_p)
     test_indices = int(val_indices + total_length * test_p)
 
-    print(f"total length: {total_length}")
+    print(f"Dataset total length: {total_length}")
     print(f"train: {train_indices}, val: {val_indices}, test: {test_indices}")
 
-    X_train, y_train = build_dataset(
-        text_data=dataset[:train_indices], block_size=block_size, stoi=stoi
-    )
-    X_val, y_val = build_dataset(
-        text_data=dataset[train_indices:val_indices], block_size=block_size, stoi=stoi
-    )
-    X_test, y_test = build_dataset(
-        text_data=dataset[val_indices:test_indices], block_size=block_size, stoi=stoi
-    )
+    X_train, y_train = build_dataset(text_data=dataset[:train_indices], block_size=block_size, stoi=stoi)
+    X_val, y_val = build_dataset(text_data=dataset[train_indices:val_indices], block_size=block_size, stoi=stoi)
+    X_test, y_test = build_dataset(text_data=dataset[val_indices:test_indices], block_size=block_size, stoi=stoi)
 
     return X_train, y_train, X_val, y_val, X_test, y_test
