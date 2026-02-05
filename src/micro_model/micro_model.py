@@ -4,7 +4,11 @@ from torch import nn
 
 class MicroModel(nn.Module):
     def __init__(
-        self, vocab_size: int, embed_dims: int, block_size: int, hidden_dims: int
+        self,
+        vocab_size: int,
+        embed_dims: int,
+        block_size: int,
+        hidden_dims: int,
     ) -> None:
         super().__init__()
         self.vocab_size = vocab_size
