@@ -7,11 +7,10 @@ from torch.utils.data import DataLoader, TensorDataset
 from micro_data_utils.micro_dataset import (
     get_micro_dataset,
     get_micro_transformer,
-    micro_transform,
     micro_transform_and_split_data,
 )
 from micro_utils.micro_parser_utils import read_args
-from engine.train import train
+from engine.train import train, evaluate_one_epoch
 from micro_model.micro_model import MicroModel
 from micro_utils.micro_save_utils import save_model, save_hyperparameters
 
@@ -80,8 +79,12 @@ def main() -> None:
     )
     time_after = datetime.datetime.now()
 
+    # test model
+    test_loss = evaluate_one_epoch(model=micro_model, val_dataloader=test_dataloader, loss_fn=loss_fn, device=device)
+
     print(f"Average training loss: {sum(train_loss) / len(train_loss):.3f}")
     print(f"Average val loss: {sum(val_loss) / len(val_loss):.3f}")
+    print(f"Average test loss: {sum(test_loss) / len(test_loss):.3f}")
 
     # save model
     if should_save:
@@ -94,6 +97,9 @@ def main() -> None:
             hidden_size=hidden_size,
             embedding_size=embedding_size,
             time=time_after.second - time_before.second,
+            train_loss=train_loss,
+            val_loss=val_loss,
+            test_loss=test_loss,
         )
 
 

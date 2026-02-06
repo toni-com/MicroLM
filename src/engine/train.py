@@ -1,3 +1,4 @@
+import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -29,7 +30,7 @@ def train(
             device=device,
         )
 
-        val_loss = val_one_epoch(model=model, val_dataloader=val_dataloader, loss_fn=loss_fn, device=device)
+        val_loss = evaluate_one_epoch(model=model, val_dataloader=val_dataloader, loss_fn=loss_fn, device=device)
 
         if (epoch + 1) % 1 == 0:
             print(f"Epoch {epoch+1}/{epochs}:")
@@ -73,19 +74,20 @@ def train_one_epoch(
     return train_losses
 
 
-def val_one_epoch(model: nn.Module, val_dataloader: DataLoader, loss_fn: nn.Module, device: str) -> list[float]:
-    val_losses = []
-
+def evaluate_one_epoch(model: nn.Module, val_dataloader: DataLoader, loss_fn: nn.Module, device: str) -> list[float]:
     model.eval()
-    for X, y in val_dataloader:
-        X = X.to(device)
-        y = y.to(device)
+    losses = []
 
-        # forward pass
-        y_pred = model(X)
+    with torch.no_grad():
+        for X, y in val_dataloader:
+            X = X.to(device)
+            y = y.to(device)
 
-        # track loss
-        loss = loss_fn(y_pred, y)
-        val_losses.append(loss.item())
+            # forward pass
+            y_pred = model(X)
 
-    return val_losses
+            # track loss
+            loss = loss_fn(y_pred, y)
+            losses.append(loss.item())
+
+    return losses
