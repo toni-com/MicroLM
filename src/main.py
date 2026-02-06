@@ -12,7 +12,7 @@ from micro_data_utils.micro_dataset import (
 from micro_utils.micro_parser_utils import read_args
 from engine.train import train, evaluate_one_epoch
 from micro_model.micro_model import MicroModel
-from micro_utils.micro_save_utils import save_model, save_hyperparameters
+from micro_utils.micro_save_utils import save_model, save_hyperparameters, get_output_names
 
 
 def main() -> None:
@@ -88,8 +88,11 @@ def main() -> None:
 
     # save model
     if should_save:
-        save_model(model=micro_model)
+        output_dir = get_output_names()
+
+        save_model(model=micro_model, output_dir=output_dir)
         save_hyperparameters(
+            output_dir=output_dir,
             epochs=epochs,
             batch_size=batch_size,
             lr=lr,

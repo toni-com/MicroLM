@@ -6,18 +6,25 @@ import torch
 from torch import nn
 
 
-def save_model(model: nn.Module):
+def get_output_names() -> str:
     output_path = "src/micro_model/models"
     dir_path = f"{output_path}/{datetime.datetime.now().strftime('%d-%m__%H-%M')}"
-    file_path = f"{dir_path}/model.pth"
 
     os.makedirs(dir_path, exist_ok=True)
+
+    return dir_path
+
+
+def save_model(model: nn.Module, output_dir: str) -> None:
+    file_path = f"{output_dir}/model.pth"
+    os.makedirs(output_dir, exist_ok=True)
 
     torch.save(model.state_dict(), file_path)
     print(f"Model saved to {file_path}")
 
 
 def save_hyperparameters(
+    output_dir: str,
     epochs: int,
     batch_size: int,
     lr: float,
@@ -29,15 +36,11 @@ def save_hyperparameters(
     val_loss: list[float],
     test_loss: list[float],
 ) -> None:
-    now = datetime.datetime.now()
-    output_path = "src/micro_model/models"
-    dir_path = f"{output_path}/{now.strftime('%d-%m__%H-%M')}"
-    file_path = f"{dir_path}/params.json"
-
-    os.makedirs(dir_path, exist_ok=True)
+    file_path = f"{output_dir}/params.json"
+    os.makedirs(output_dir, exist_ok=True)
 
     hyper_params = {
-        "date": now.strftime("%d-%m-%Y - %H:%M"),
+        "date": datetime.datetime.now().strftime("%d-%m-%Y - %H:%M"),
         "epochs": epochs,
         "batch_size": batch_size,
         "lr": lr,
