@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import pickle
 
 import torch
 from torch import nn
@@ -20,7 +21,7 @@ def save_model(model: nn.Module, output_dir: str) -> None:
     os.makedirs(output_dir, exist_ok=True)
 
     torch.save(model.state_dict(), file_path)
-    print(f"Model saved to {file_path}")
+    print(f"\nModel saved to {file_path}")
 
 
 def save_hyperparameters(
@@ -32,9 +33,6 @@ def save_hyperparameters(
     hidden_size: int,
     embedding_size: int,
     time: float,
-    train_loss: list[float],
-    val_loss: list[float],
-    test_loss: list[float],
 ) -> None:
     file_path = f"{output_dir}/params.json"
     os.makedirs(output_dir, exist_ok=True)
@@ -48,11 +46,28 @@ def save_hyperparameters(
         "hidden_size": hidden_size,
         "embedding_size": embedding_size,
         "time": time,
-        "train_loss": train_loss,
-        "val_loss": val_loss,
-        "test_loss": test_loss,
     }
 
     with open(file_path, "w") as f:
         json.dump(hyper_params, f, indent=4)
     print(f"Hyperparameters saved to {file_path}")
+
+
+def save_losses(
+    output_dir: str,
+    train_loss: list[float],
+    val_loss: list[float],
+    test_loss: list[float],
+) -> None:
+    file_path = f"{output_dir}/losses.pickle"
+    os.makedirs(output_dir, exist_ok=True)
+
+    losses = {
+        "train_loss": train_loss,
+        "val_loss": val_loss,
+        "test_loss": test_loss,
+    }
+
+    with open(file_path, "wb") as f:
+        pickle.dump(losses, f, protocol=pickle.HIGHEST_PROTOCOL)
+    print(f"Losses saved to {file_path}")

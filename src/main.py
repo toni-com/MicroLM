@@ -12,7 +12,7 @@ from micro_data_utils.micro_dataset import (
 from micro_utils.micro_parser_utils import read_args
 from engine.train import train, evaluate_one_epoch
 from micro_model.micro_model import MicroModel
-from micro_utils.micro_save_utils import save_model, save_hyperparameters, get_output_names
+from micro_utils.micro_save_utils import save_model, save_hyperparameters, save_losses, get_output_names
 
 
 def main() -> None:
@@ -100,10 +100,8 @@ def main() -> None:
             hidden_size=hidden_size,
             embedding_size=embedding_size,
             time=time_after.second - time_before.second,
-            train_loss=train_loss,
-            val_loss=val_loss,
-            test_loss=test_loss,
         )
+        save_losses(train_loss=train_loss, val_loss=val_loss, test_loss=test_loss, output_dir=output_dir)
 
 
 if __name__ == "__main__":
