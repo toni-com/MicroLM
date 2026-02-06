@@ -27,18 +27,19 @@ def generate(
 
     out = prompt_ids[:]
 
-    for _ in range(max_new_tokens):
-        input_ix = torch.tensor([context_window]).to(device)
-        logits = model(input_ix)
-        probs = torch.softmax(logits, dim=1)
+    with torch.no_grad():
+        for _ in range(max_new_tokens):
+            input_ix = torch.tensor([context_window]).to(device)
+            logits = model(input_ix)
+            probs = torch.softmax(logits, dim=1)
 
-        # sample
-        ix = torch.multinomial(probs, num_samples=1).item()
-        out.append(ix)
-        context_window = context_window[1:] + [ix]
+            # sample
+            ix = torch.multinomial(probs, num_samples=1).item()
+            out.append(ix)
+            context_window = context_window[1:] + [ix]
 
-        if ix == 0:
-            break
+            if ix == 0:
+                break
 
     return "".join([itos[i] for i in out])
 
