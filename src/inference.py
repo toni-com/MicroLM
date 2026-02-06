@@ -13,6 +13,18 @@ def main():
 
     model, itos, stoi, config = load_model(checkpoint_path, device=device)
 
+    output = generate(
+        model=model,
+        prompt="Once",
+        stoi=stoi,
+        itos=itos,
+        block_size=config["block_size"],
+        max_new_tokens=250,
+        device=device,
+    )
+
+    print(output)
+
 
 def generate(
     model: MicroModel, prompt: str, stoi: dict, itos: dict, block_size: int, max_new_tokens: int, device: torch.device
@@ -58,10 +70,10 @@ def load_model(
     state_dict = checkpoint["model_state_dict"]
 
     model = MicroModel(
-        vocab_size=config["vocab_size"],
-        embed_dims=config["embed_dims"],
+        vocab_size=len(stoi),
+        embed_dims=config["embed_dim"],
         block_size=config["block_size"],
-        hidden_dims=config["hidden_dims"],
+        hidden_dims=config["hidden_dim"],
     )
 
     model.load_state_dict(state_dict)

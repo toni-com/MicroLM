@@ -32,4 +32,4 @@ def read_inference_args():
 
     args = parser.parse_args()
 
-    return (args.model_path,)
+    return args.model_path

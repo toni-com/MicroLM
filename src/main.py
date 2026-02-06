@@ -95,8 +95,8 @@ def main() -> None:
             "batch_size": batch_size,
             "lr": lr,
             "block_size": block_size,
-            "hidden_size": hidden_size,
-            "embedding_size": embedding_size,
+            "hidden_dim": hidden_size,
+            "embed_dim": embedding_size,
             "time": time_after.second - time_before.second,
         }
 
