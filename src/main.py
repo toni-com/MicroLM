@@ -9,16 +9,16 @@ from micro_data_utils.micro_dataset import (
     get_micro_transformer,
     micro_transform_and_split_data,
 )
-from micro_utils.micro_parser_utils import read_args
+from micro_utils.micro_parser_utils import read_train_args
 from engine.train import train, evaluate_one_epoch
 from micro_model.micro_model import MicroModel
-from micro_utils.micro_save_utils import save_model, save_hyperparameters, save_losses, get_output_names
+from micro_utils.micro_save_utils import save_checkpoint, save_hyperparameters, save_losses, get_output_names
 
 
 def main() -> None:
 
     # read args
-    epochs, batch_size, lr, block_size, hidden_size, embedding_size, should_save, test_run = read_args()
+    epochs, batch_size, lr, block_size, hidden_size, embedding_size, should_save, test_run = read_train_args()
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(
         f"Running on the following parameters: \n"
@@ -89,18 +89,19 @@ def main() -> None:
     # save model
     if should_save:
         output_dir = get_output_names()
+        hyper_params = {
+            "date": datetime.datetime.now().strftime("%d-%m-%Y - %H:%M"),
+            "epochs": epochs,
+            "batch_size": batch_size,
+            "lr": lr,
+            "block_size": block_size,
+            "hidden_size": hidden_size,
+            "embedding_size": embedding_size,
+            "time": time_after.second - time_before.second,
+        }
 
-        save_model(model=micro_model, output_dir=output_dir)
-        save_hyperparameters(
-            output_dir=output_dir,
-            epochs=epochs,
-            batch_size=batch_size,
-            lr=lr,
-            block_size=block_size,
-            hidden_size=hidden_size,
-            embedding_size=embedding_size,
-            time=time_after.second - time_before.second,
-        )
+        save_checkpoint(model=micro_model, itos=itos, stoi=stoi, hyper_params=hyper_params, output_dir=output_dir)
+        save_hyperparameters(hyper_params=hyper_params, output_dir=output_dir)
         save_losses(train_loss=train_loss, val_loss=val_loss, test_loss=test_loss, output_dir=output_dir)
 
 

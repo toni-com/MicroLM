@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import pickle
+from typing import Any
 
 import torch
 from torch import nn
@@ -26,31 +27,24 @@ def save_model(model: nn.Module, output_dir: str) -> None:
 
 def save_hyperparameters(
     output_dir: str,
-    epochs: int,
-    batch_size: int,
-    lr: float,
-    block_size: int,
-    hidden_size: int,
-    embedding_size: int,
-    time: float,
+    hyper_params: dict[str, Any],
 ) -> None:
     file_path = f"{output_dir}/params.json"
     os.makedirs(output_dir, exist_ok=True)
 
-    hyper_params = {
-        "date": datetime.datetime.now().strftime("%d-%m-%Y - %H:%M"),
-        "epochs": epochs,
-        "batch_size": batch_size,
-        "lr": lr,
-        "block_size": block_size,
-        "hidden_size": hidden_size,
-        "embedding_size": embedding_size,
-        "time": time,
-    }
-
     with open(file_path, "w") as f:
         json.dump(hyper_params, f, indent=4)
     print(f"Hyperparameters saved to {file_path}")
+
+
+def save_checkpoint(model: nn.Module, itos: dict, stoi: dict, hyper_params: dict, output_dir: str) -> None:
+    os.makedirs(output_dir, exist_ok=True)
+    file_path = f"{output_dir}/checkpoint.pth"
+
+    checkpoint = {"model_state_dict": model.state_dict(), "itos": itos, "stoi": stoi, "config": hyper_params}
+
+    torch.save(checkpoint, file_path)
+    print(f"\nCheckpoint saved to {file_path}")
 
 
 def save_losses(
