@@ -1,7 +1,7 @@
 import argparse
 
 
-def read_args():
+def read_train_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", required=False, type=int, default=10, help="Number of Epochs.")
     parser.add_argument("--batch_size", required=False, type=int, default=64, help="Batch size.")
@@ -24,3 +24,12 @@ def read_args():
         args.save,
         args.test_run,
     )
+
+
+def read_inference_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model_path", required=False, type=str, default=None, help="Path to saved model.")
+
+    args = parser.parse_args()
+
+    return (args.model_path,)
