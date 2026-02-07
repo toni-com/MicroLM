@@ -60,7 +60,7 @@ def main() -> None:
     )
     micro_model = micro_model.to(device)
 
-    optimizer = torch.optim.SGD(micro_model.parameters(), lr=lr, momentum=0.9)
+    optimizer = torch.optim.AdamW(params=micro_model.parameters(), lr=lr)
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     loss_fn = nn.CrossEntropyLoss()
 

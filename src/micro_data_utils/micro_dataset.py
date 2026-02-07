@@ -5,7 +5,7 @@ import torch
 
 
 def get_micro_dataset() -> list[str]:
-    dataset = load_dataset("roneneldan/TinyStories", split="train[:1%]")
+    dataset = load_dataset("roneneldan/TinyStories", split="train[:3%]")
     return list(dataset["text"])
 
 
@@ -14,8 +14,8 @@ def get_micro_transformer(dataset: list[str]) -> tuple[dict[str, int], dict[int,
     stoi = {c: i + 2 for i, c in enumerate(unique_chars)}
     itos = {i + 2: c for i, c in enumerate(unique_chars)}
 
-    stoi["<sos>"], itos[0] = 0, "<sos>"
-    stoi["<eos>"], itos[1] = 1, "<eos>"
+    # stoi["<sos>"], itos[0] = 0, "<sos>"
+    # stoi["<eos>"], itos[1] = 1, "<eos>"
     return stoi, itos
 
 
