@@ -11,8 +11,8 @@ def get_micro_dataset() -> list[str]:
 
 def get_micro_transformer(dataset: list[str]) -> tuple[dict[str, int], dict[int, str]]:
     unique_chars = set([c for element in dataset for c in element])
-    stoi = {c: i + 2 for i, c in enumerate(unique_chars)}
-    itos = {i + 2: c for i, c in enumerate(unique_chars)}
+    stoi = {c: i for i, c in enumerate(unique_chars)}
+    itos = {i: c for i, c in enumerate(unique_chars)}
 
     # stoi["<sos>"], itos[0] = 0, "<sos>"
     # stoi["<eos>"], itos[1] = 1, "<eos>"
@@ -64,7 +64,7 @@ def micro_transform_and_split_data(
     test_indices = int(val_indices + total_length * test_p)
 
     print(f"Dataset total length: {total_length}")
-    print(f"train: {train_indices}, val: {val_indices}, test: {test_indices}")
+    print(f"train: {train_indices}, val: {val_indices-train_indices}, test: {test_indices-val_indices}")
 
     X_train, y_train = build_dataset(text_data=dataset[:train_indices], block_size=block_size, stoi=stoi)
     X_val, y_val = build_dataset(text_data=dataset[train_indices:val_indices], block_size=block_size, stoi=stoi)
