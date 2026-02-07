@@ -29,7 +29,13 @@ def read_train_args():
 def read_inference_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", required=False, type=str, default=None, help="Path to saved model.")
-
+    parser.add_argument("--prompt", required=False, type=str, default=None, help="Prompt sentence.")
     args = parser.parse_args()
+    return args.model_path, args.prompt
 
-    return args.model_path
+
+def read_eval_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--results_path", required=False, type=str, default=None, help="Path to pickled results.")
+    args = parser.parse_args()
+    return args.results_path

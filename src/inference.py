@@ -8,14 +8,14 @@ from micro_model.micro_model import MicroModel
 
 def main():
 
-    checkpoint_path = read_inference_args()
+    checkpoint_path, prompt = read_inference_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model, itos, stoi, config = load_model(checkpoint_path, device=device)
 
     output = generate(
         model=model,
-        prompt="Once",
+        prompt=prompt,
         stoi=stoi,
         itos=itos,
         block_size=config["block_size"],
