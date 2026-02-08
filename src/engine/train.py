@@ -60,10 +60,12 @@ def train_one_epoch(
         y = y.to(device)
 
         # forward pass
-        y_pred = model(X)
+        y_pred = model(X)  # Batch x Vocab_Size
 
         # backward pass
-        loss = loss_fn(y_pred, y)
+        last_target = y[:, -1]
+        loss = loss_fn(y_pred, last_target)
+
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -71,7 +73,8 @@ def train_one_epoch(
         # track loss
         train_losses.append(loss.item())
 
-    return train_losses
+    avg_loss = sum(train_losses) / len(train_losses)
+    return [avg_loss]
 
 
 def evaluate_one_epoch(model: nn.Module, val_dataloader: DataLoader, loss_fn: nn.Module, device: str) -> list[float]:
@@ -85,9 +88,10 @@ def evaluate_one_epoch(model: nn.Module, val_dataloader: DataLoader, loss_fn: nn
 
             # forward pass
             y_pred = model(X)
+            last_target = y[:, -1]
 
             # track loss
-            loss = loss_fn(y_pred, y)
+            loss = loss_fn(y_pred, last_target)
             losses.append(loss.item())
 
     return losses

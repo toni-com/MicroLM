@@ -2,17 +2,13 @@ import datetime
 
 import torch
 from torch import nn
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader
 
-from micro_data_utils.micro_dataset import (
-    get_micro_dataset,
-    get_micro_transformer,
-    micro_transform_and_split_data,
-)
 from micro_utils.micro_parser_utils import read_train_args
 from engine.train import train, evaluate_one_epoch
 from micro_model.micro_model import MicroModel
 from micro_utils.micro_save_utils import save_checkpoint, save_hyperparameters, save_losses, get_output_names
+from micro_data_utils.micro_dataset import MicroDataset, get_micro_dataset, get_micro_transformer
 
 
 def main() -> None:
@@ -37,19 +33,7 @@ def main() -> None:
         full_data = full_data[0 : int(len(full_data) * 0.2)]
     stoi, itos = get_micro_transformer(full_data)
 
-    X_train, y_train, X_val, y_val, X_test, y_test = micro_transform_and_split_data(
-        dataset=full_data, block_size=block_size, stoi=stoi, split=[0.7, 0.15, 0.15]
-    )
-
-    # get dataloader ready
-    train_dataset = TensorDataset(X_train, y_train)
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-
-    val_dataset = TensorDataset(X_val, y_val)
-    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
-
-    test_dataset = TensorDataset(X_test, y_test)
-    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    test_dataloader, train_dataloader, val_dataloader = load_data(full_data, stoi, batch_size, block_size)
 
     # init models and params
     micro_model = MicroModel(
@@ -103,6 +87,30 @@ def main() -> None:
         save_checkpoint(model=micro_model, itos=itos, stoi=stoi, hyper_params=hyper_params, output_dir=output_dir)
         save_hyperparameters(hyper_params=hyper_params, output_dir=output_dir)
         save_losses(train_loss=train_loss, val_loss=val_loss, test_loss=test_loss, output_dir=output_dir)
+
+
+def load_data(full_data, stoi, batch_size, block_size) -> tuple[DataLoader, DataLoader, DataLoader]:
+    split_idx_train = int(len(full_data) * 0.7)
+    split_idx_val = int(len(full_data) * 0.85)
+
+    train_text = full_data[:split_idx_train]
+    val_text = full_data[split_idx_train:split_idx_val]
+    test_text = full_data[split_idx_val:]
+
+    train_dataset = MicroDataset(text_data=train_text, stoi=stoi, block_size=block_size)
+    val_dataset = MicroDataset(text_data=val_text, stoi=stoi, block_size=block_size)
+    test_dataset = MicroDataset(text_data=test_text, stoi=stoi, block_size=block_size)
+
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+    print(
+        f"Training data size: {len(train_dataloader)}",
+        f"Validation data size: {len(val_dataloader)}",
+        f"Test data size: {len(test_dataloader)}",
+    )
+    return test_dataloader, train_dataloader, val_dataloader
 
 
 if __name__ == "__main__":
