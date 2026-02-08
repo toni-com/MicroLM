@@ -94,4 +94,5 @@ def evaluate_one_epoch(model: nn.Module, val_dataloader: DataLoader, loss_fn: nn
             loss = loss_fn(y_pred, last_target)
             losses.append(loss.item())
 
-    return losses
+    avg_loss = sum(losses) / len(losses)
+    return [avg_loss]

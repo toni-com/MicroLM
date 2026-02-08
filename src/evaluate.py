@@ -19,13 +19,15 @@ def plot_loss(results_path):
     except FileNotFoundError:
         raise FileNotFoundError(f"Results file {results_path} not found.")
 
-    fig, ax = plt.subplots(2, 2, figsize=(12, 8))
-    ax[0, 0].plot([i for i in range(len(results["train_loss"]))], results["train_loss"])
-    ax[0, 0].set_title("Training Loss")
-    ax[0, 1].plot([i for i in range(len(results["val_loss"]))], results["val_loss"])
-    ax[0, 1].set_title("Validation Loss")
-    ax[1, 0].plot([i for i in range(len(results["test_loss"]))], results["test_loss"])
-    ax[1, 0].set_title("Test Loss")
+    fig = plt.figure(figsize=(6, 6))
+    plt.title("Loss Curve over epochs")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.plot([i for i in range(len(results["train_loss"]))], results["train_loss"], label="Train", color="blue")
+    plt.plot([i for i in range(len(results["val_loss"]))], results["val_loss"], label="Validation", color="red")
+    plt.axhline(y=results["test_loss"], label="Test", color="green", linestyle="--")
+    plt.legend()
+    fig.tight_layout()
 
 
 if __name__ == "__main__":
