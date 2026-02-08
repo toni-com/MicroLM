@@ -91,7 +91,7 @@ def load_data_and_shuffle(full_data):
 def main():
     # laod data
     full_data = get_micro_dataset()
-    if True:
+    if False:
         full_data = full_data[: (len(full_data) // 2)]
     full_data = load_data_and_shuffle(full_data)
     stoi, _ = get_micro_transformer(full_data)
@@ -99,7 +99,7 @@ def main():
 
     # init hyperparams
     param_grid = {
-        "epochs": [2],
+        "epochs": [5],
         "lr": [0.001],
         "batch_size": [64],
         "block_size": [32, 64],
