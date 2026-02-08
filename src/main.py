@@ -1,4 +1,5 @@
 import datetime
+import random
 
 import torch
 from torch import nn
@@ -7,11 +8,12 @@ from torch.utils.data import DataLoader
 from micro_utils.micro_parser_utils import read_train_args
 from engine.train import train, evaluate_one_epoch
 from micro_model.micro_model import MicroModel
-from micro_utils.micro_save_utils import save_checkpoint, save_hyperparameters, save_losses, get_output_names
+from micro_utils.micro_save_utils import save_checkpoint, save_hyperparameters, save_losses, get_output_names, set_seed
 from micro_data_utils.micro_dataset import MicroDataset, get_micro_dataset, get_micro_transformer
 
 
 def main() -> None:
+    set_seed(12)
 
     # read args
     epochs, batch_size, lr, block_size, hidden_size, embedding_size, should_save, test_run = read_train_args()
@@ -90,6 +92,8 @@ def main() -> None:
 
 
 def load_data(full_data, stoi, batch_size, block_size) -> tuple[DataLoader, DataLoader, DataLoader]:
+    random.shuffle(full_data)
+
     split_idx_train = int(len(full_data) * 0.7)
     split_idx_val = int(len(full_data) * 0.85)
 

@@ -2,10 +2,19 @@ import datetime
 import json
 import os
 import pickle
+import random
 from typing import Any
 
+import numpy as np
 import torch
 from torch import nn
+
+
+def set_seed(seed=12):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 
 def get_output_names() -> str:
