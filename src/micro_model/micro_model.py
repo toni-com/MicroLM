@@ -23,6 +23,7 @@ class MicroModel(nn.Module):
         dims = embed_dims * block_size
         self.layer1 = torch.nn.Linear(in_features=dims, out_features=hidden_dims)
         self.layer2 = torch.nn.Linear(in_features=hidden_dims, out_features=vocab_size)
+        self.dropout = torch.nn.Dropout(p=0.25)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # embed and flatten
@@ -32,6 +33,7 @@ class MicroModel(nn.Module):
         # layer1 + activation
         x = self.layer1(x)
         x = torch.nn.functional.relu(x)
+        x = self.dropout(x)
 
         # output
         x = self.layer2(x)
