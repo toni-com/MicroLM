@@ -17,6 +17,12 @@ def main() -> None:
 
     # read args
     epochs, batch_size, lr, block_size, hidden_size, embedding_size, should_save, test_run = read_train_args()
+    
+    # transformer params (hardcoded for now as they aren't in parser utils yet)
+    n_layer = 4
+    n_head = 4
+    dropout = 0.2
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(
         f"Running on the following parameters: \n"
@@ -27,6 +33,8 @@ def main() -> None:
         f"block_size: {block_size}\n"
         f"hidden_size: {hidden_size}\n"
         f"embedding_size: {embedding_size}\n"
+        f"n_layer: {n_layer}\n"
+        f"n_head: {n_head}\n"
     )
 
     # initialize micro_data_utils
@@ -43,6 +51,9 @@ def main() -> None:
         embed_dims=embedding_size,
         block_size=block_size,
         hidden_dims=hidden_size,
+        n_layer=n_layer,
+        n_head=n_head,
+        dropout=dropout,
     )
     micro_model = micro_model.to(device)
 
@@ -83,6 +94,9 @@ def main() -> None:
             "block_size": block_size,
             "hidden_dim": hidden_size,
             "embed_dim": embedding_size,
+            "n_layer": n_layer,
+            "n_head": n_head,
+            "dropout": dropout,
             "time": time_after.second - time_before.second,
         }
 

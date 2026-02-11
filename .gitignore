@@ -14,3 +14,7 @@ env/
 # Data
 dataset/
 raw_data/
+
+# Model Artifacts & Results
+src/micro_model/models/
+src/results/

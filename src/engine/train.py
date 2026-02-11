@@ -60,11 +60,12 @@ def train_one_epoch(
         y = y.to(device)
 
         # forward pass
-        y_pred = model(X)  # Batch x Vocab_Size
+        y_pred = model(X) # (B, T, vocab_size)
 
-        # backward pass
-        last_target = y[:, -1]
-        loss = loss_fn(y_pred, last_target)
+        # calculate loss
+        # reshape to (B*T, vocab_size) and (B*T)
+        B, T, C = y_pred.shape
+        loss = loss_fn(y_pred.view(B*T, C), y.view(B*T))
 
         optimizer.zero_grad()
         loss.backward()
@@ -88,10 +89,11 @@ def evaluate_one_epoch(model: nn.Module, val_dataloader: DataLoader, loss_fn: nn
 
             # forward pass
             y_pred = model(X)
-            last_target = y[:, -1]
-
-            # track loss
-            loss = loss_fn(y_pred, last_target)
+            
+            # calculate loss
+            B, T, C = y_pred.shape
+            loss = loss_fn(y_pred.view(B*T, C), y.view(B*T))
+            
             losses.append(loss.item())
 
     avg_loss = sum(losses) / len(losses)
