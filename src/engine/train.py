@@ -63,7 +63,6 @@ def train_one_epoch(
         y_pred = model(X) # (B, T, vocab_size)
 
         # calculate loss
-        # reshape to (B*T, vocab_size) and (B*T)
         B, T, C = y_pred.shape
         loss = loss_fn(y_pred.view(B*T, C), y.view(B*T))
 

@@ -43,7 +43,8 @@ def generate(
         for _ in range(max_new_tokens):
             input_ix = torch.tensor([context_window]).to(device)
             logits = model(input_ix)
-            probs = torch.softmax(logits, dim=1)
+            logits = logits[:, -1, :] # (B, vocab_size)
+            probs = torch.softmax(logits, dim=-1)
 
             # sample
             ix = torch.multinomial(probs, num_samples=1).item()
@@ -69,11 +70,18 @@ def load_model(
     stoi = checkpoint["stoi"]
     state_dict = checkpoint["model_state_dict"]
 
+    n_layer = config.get("n_layer", 4)
+    n_head = config.get("n_head", 4)
+    dropout = config.get("dropout", 0.2)
+
     model = MicroModel(
         vocab_size=len(stoi),
         embed_dims=config["embed_dim"],
         block_size=config["block_size"],
         hidden_dims=config["hidden_dim"],
+        n_layer=n_layer,
+        n_head=n_head,
+        dropout=dropout,
     )
 
     model.load_state_dict(state_dict)
