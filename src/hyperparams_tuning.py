@@ -51,7 +51,9 @@ def run_experiment(config, data_args):
         vocab_size=len(data_args["stoi"]),
         embed_dims=config["embed_dim"],
         block_size=config["block_size"],
-        hidden_dims=config["hidden_dim"],
+        hidden_dims=0,  # Unused in new architecture
+        n_layer=config["n_layer"],
+        n_head=config["n_head"],
     ).to(device)
 
     # train
@@ -91,20 +93,21 @@ def load_data_and_shuffle(full_data):
 def main():
     # laod data
     full_data = get_micro_dataset()
-    if False:
-        full_data = full_data[: (len(full_data) // 2)]
+    if True:
+        full_data = full_data[: (len(full_data) // 5)]
     full_data = load_data_and_shuffle(full_data)
     stoi, _ = get_micro_transformer(full_data)
     data_args = {"full_data": full_data, "stoi": stoi}
 
     # init hyperparams
     param_grid = {
-        "epochs": [5],
+        "epochs": [3],
         "lr": [0.001],
         "batch_size": [64],
-        "block_size": [32, 64],
-        "hidden_dim": [64, 128],
-        "embed_dim": [32, 64, 128],
+        "block_size": [32],
+        "embed_dim": [64],
+        "n_layer": [4, 6],
+        "n_head": [4, 8],
     }
 
     keys, values = zip(*param_grid.items())
@@ -112,13 +115,24 @@ def main():
 
     # run loop
     results = []
-    for i, config in enumerate(configs):
-        print(f"--- Tuning {i+1}/{len(configs)} ---")
+    valid_configs = []
+
+    # Filter valid configurations
+    for config in configs:
+        if config["embed_dim"] % config["n_head"] == 0:
+            valid_configs.append(config)
+
+    for i, config in enumerate(valid_configs):
+        print(f"--- Tuning {i+1}/{len(valid_configs)} ---")
         try:
             result = run_experiment(config, data_args)
             results.append(result)
         except Exception as e:
             print(f"Run failed: {e}")
+
+    if not results:
+        print("No valid results found.")
+        return
 
     results = sorted(results, key=lambda x: x["avg_test_loss"])
     # save results

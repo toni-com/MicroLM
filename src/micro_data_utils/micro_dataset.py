@@ -35,5 +35,5 @@ def get_micro_transformer(dataset: list[str]) -> tuple[dict[str, int], dict[int,
 
 
 def get_micro_dataset() -> list[str]:
-    dataset = load_dataset("roneneldan/TinyStories", split="train[:3%]")
+    dataset = load_dataset("roneneldan/TinyStories", split="train[:5%]")
     return list(dataset["text"])
