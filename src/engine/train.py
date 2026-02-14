@@ -14,10 +14,14 @@ def train(
     loss_fn: nn.Module,
     device: str,
     use_tqdm: bool = True,
+    patience: int = 5,
 ) -> tuple[list[float], list[float]]:
 
     train_losses = []
     val_losses = []
+    
+    best_val_loss = float("inf")
+    patience_counter = 0
 
     for epoch in range(epochs):
         looping_iterator = tqdm(train_dataloader, desc=f"Training Epoch: {epoch+1}") if use_tqdm else train_dataloader
@@ -31,14 +35,26 @@ def train(
         )
 
         val_loss = evaluate_one_epoch(model=model, val_dataloader=val_dataloader, loss_fn=loss_fn, device=device)
+        avg_val_loss = sum(val_loss) / len(val_loss)
 
         if (epoch + 1) % 1 == 0:
             print(f"Epoch {epoch+1}/{epochs}:")
             print(f"Average train loss last epoch: {sum(train_loss) / len(train_loss):.3f}")
-            print(f"Average validation loss last epoch: {sum(val_loss) / len(val_loss):.3f}")
+            print(f"Average validation loss last epoch: {avg_val_loss:.3f}")
 
         train_losses.extend(train_loss)
         val_losses.extend(val_loss)
+
+        # Early Stopping Logic
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
+            patience_counter = 0
+        else:
+            patience_counter += 1
+            print(f"Validation loss did not improve. Patience: {patience_counter}/{patience}")
+            if patience_counter >= patience:
+                print("Early stopping triggered.")
+                break
 
         scheduler.step()
 

@@ -16,11 +16,13 @@ def main() -> None:
     set_seed(12)
 
     # read args
-    epochs, batch_size, lr, block_size, hidden_size, embedding_size, should_save, test_run = read_train_args()
-    
+    epochs, batch_size, lr, block_size, hidden_size, embedding_size, should_save, test_run, dataset_name, patience = (
+        read_train_args()
+    )
+
     # transformer params (hardcoded for now as they aren't in parser utils yet)
-    n_layer = 4
-    n_head = 4
+    n_layer = 6
+    n_head = 8
     dropout = 0.2
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -35,10 +37,12 @@ def main() -> None:
         f"embedding_size: {embedding_size}\n"
         f"n_layer: {n_layer}\n"
         f"n_head: {n_head}\n"
+        f"dataset: {dataset_name}\n"
+        f"patience: {patience}\n"
     )
 
     # initialize micro_data_utils
-    full_data = get_micro_dataset()
+    full_data = get_micro_dataset(dataset_name)
     if test_run:
         full_data = full_data[0 : int(len(full_data) * 0.2)]
     stoi, itos = get_micro_transformer(full_data)
@@ -73,6 +77,7 @@ def main() -> None:
         loss_fn=loss_fn,
         device=device,
         use_tqdm=True,
+        patience=patience,
     )
     time_after = datetime.datetime.now()
 

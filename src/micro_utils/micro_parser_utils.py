@@ -11,6 +11,14 @@ def read_train_args():
     parser.add_argument("--embedding_size", required=False, type=int, default=64, help="Embedding size.")
     parser.add_argument("--save", required=False, type=bool, default=True, help="Save model.")
     parser.add_argument("--test_run", required=False, type=bool, default=False, help="Test run.")
+    parser.add_argument(
+        "--dataset",
+        required=False,
+        type=str,
+        default="roneneldan/TinyStories",
+        help="Dataset name",
+    )
+    parser.add_argument("--patience", required=False, type=int, default=4, help="Early stopping patience.")
 
     args = parser.parse_args()
 
@@ -23,6 +31,8 @@ def read_train_args():
         args.embedding_size,
         args.save,
         args.test_run,
+        args.dataset,
+        args.patience,
     )
 
 

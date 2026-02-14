@@ -34,6 +34,12 @@ def get_micro_transformer(dataset: list[str]) -> tuple[dict[str, int], dict[int,
     return stoi, itos
 
 
-def get_micro_dataset() -> list[str]:
-    dataset = load_dataset("roneneldan/TinyStories", split="train[:5%]")
+def get_micro_dataset(dataset_name: str = "roneneldan/TinyStories") -> list[str]:
+    if dataset_name == "wikitext":
+        dataset = load_dataset("wikitext", "wikitext-2-raw-v1", split="train")
+    elif dataset_name == "wikitext-103":
+        dataset = load_dataset("wikitext", "wikitext-103-raw-v1", split="train")
+    else:
+        dataset = load_dataset(dataset_name, split="train[:5%]")
+    
     return list(dataset["text"])
