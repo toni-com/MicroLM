@@ -41,11 +41,11 @@ def read_inference_args():
     parser.add_argument("--path", required=False, type=str, default=None, help="Path to saved model.")
     parser.add_argument("--prompt", required=False, type=str, default=None, help="Prompt sentence.")
     args = parser.parse_args()
-    return args.model_path, args.prompt
+    return args.path, args.prompt
 
 
 def read_eval_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", required=False, type=str, default=None, help="Path to pickled results.")
     args = parser.parse_args()
-    return args.results_path
+    return args.path
