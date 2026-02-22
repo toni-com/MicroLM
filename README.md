@@ -1,7 +1,7 @@
 ## MicroLM
 
-> The brown fox took now, so the end.One day, Emily knew he chased, she said.
-> From that Lily looked at the branche and said, "Okay, Blue. We can go home, Mom and Dad were being delight, "Hi, Mom!" Mom said.
+> The brown fox was very excited and would always buy everyone many adventurous.
+> One day, Tim saw a ball with amazement! How much the rail was very happy to respect herself and the butterfly. 
 
 I used the TinyStories dataset consisting of fairy-tale-like stories; given a prompt it produces English output that is mostly grammatically and orthographically correct but often nonsensical, as seen in the quote above. The model was trained for only 3 epochs due to limited computing power and time, which is not sufficient for full convergence and explains why the generated text, while structurally plausible, often lacks coherent meaning.
 
