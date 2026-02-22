@@ -40,6 +40,6 @@ def get_micro_dataset(dataset_name: str = "roneneldan/TinyStories") -> list[str]
     elif dataset_name == "wikitext-103":
         dataset = load_dataset("wikitext", "wikitext-103-raw-v1", split="train")
     else:
-        dataset = load_dataset(dataset_name, split="train[:5%]")
-    
+        dataset = load_dataset(dataset_name, split="train[:4%]")
+
     return list(dataset["text"])

@@ -23,7 +23,7 @@ def main() -> None:
     # transformer params (hardcoded for now as they aren't in parser utils yet)
     n_layer = 6
     n_head = 8
-    dropout = 0.2
+    dropout = 0.15
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(
