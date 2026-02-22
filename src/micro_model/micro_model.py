@@ -1,41 +1,7 @@
 import torch
 from torch import nn
-from torch.nn import functional as F
 
-class Head(nn.Module):
-    def __init__(self, head_size, n_embed, block_size, dropout=0.2):
-        super().__init__()
-        self.key = nn.Linear(n_embed, head_size, bias=False)
-        self.query = nn.Linear(n_embed, head_size, bias=False)
-        self.value = nn.Linear(n_embed, head_size, bias=False)
-        self.register_buffer('tril', torch.tril(torch.ones(block_size, block_size)))
 
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, x):
-        B,T,C = x.shape
-        k = self.key(x)
-        q = self.query(x)
-        wei = q @ k.transpose(-2,-1) * k.shape[-1]**-0.5
-        wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf'))
-        wei = F.softmax(wei, dim=-1)
-        wei = self.dropout(wei)
-        v = self.value(x)
-        out = wei @ v
-        return out
-
-class MultiHeadAttention(nn.Module):
-    def __init__(self, num_heads, head_size, n_embed, block_size, dropout=0.2):
-        super().__init__()
-        self.heads = nn.ModuleList([Head(head_size, n_embed, block_size, dropout) for _ in range(num_heads)])
-        self.proj = nn.Linear(head_size * num_heads, n_embed)
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, x):
-        out = torch.cat([h(x) for h in self.heads], dim=-1)
-        out = self.proj(out)
-        out = self.dropout(out)
-        return out
 
 class FeedFoward(nn.Module):
     def __init__(self, n_embed, dropout=0.2):
@@ -53,14 +19,19 @@ class FeedFoward(nn.Module):
 class Block(nn.Module):
     def __init__(self, n_embed, n_head, block_size, dropout=0.2):
         super().__init__()
-        head_size = n_embed // n_head
-        self.sa = MultiHeadAttention(n_head, head_size, n_embed, block_size, dropout)
+        self.sa = nn.MultiheadAttention(n_embed, n_head, dropout=dropout, batch_first=True)
+        self.register_buffer('causal_mask', torch.ones(block_size, block_size, dtype=torch.bool).tril())
         self.ffwd = FeedFoward(n_embed, dropout)
         self.ln1 = nn.LayerNorm(n_embed)
         self.ln2 = nn.LayerNorm(n_embed)
 
     def forward(self, x):
-        x = x + self.sa(self.ln1(x))
+        B, T, C = x.shape
+        x_norm = self.ln1(x)
+        # invert the causal mask
+        attn_mask = ~self.causal_mask[:T, :T]
+        attn_out, _ = self.sa(x_norm, x_norm, x_norm, attn_mask=attn_mask, is_causal=True)
+        x = x + attn_out
         x = x + self.ffwd(self.ln2(x))
         return x
 

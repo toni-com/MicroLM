@@ -26,6 +26,7 @@ def main() -> None:
     dropout = 0.15
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    torch.set_float32_matmul_precision("high")
     print(
         f"Running on the following parameters: \n"
         f"device: {device}\n"
@@ -60,6 +61,13 @@ def main() -> None:
         dropout=dropout,
     )
     micro_model = micro_model.to(device)
+    if device == "cuda":
+        try:
+            import triton
+            micro_model = torch.compile(micro_model, mode="reduce-overhead")
+            print("torch.compile enabled (Triton backend)")
+        except ImportError:
+            print("triton not found - torch.compile skipped")
 
     optimizer = torch.optim.AdamW(params=micro_model.parameters(), lr=lr)
     scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
