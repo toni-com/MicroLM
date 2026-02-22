@@ -51,9 +51,6 @@ def generate(
             out.append(ix)
             context_window = context_window[1:] + [ix]
 
-            if ix == 0:
-                break
-
     return "".join([itos[i] for i in out])
 
 
