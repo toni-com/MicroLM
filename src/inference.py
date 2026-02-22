@@ -70,6 +70,11 @@ def load_model(
     stoi = checkpoint["stoi"]
     state_dict = checkpoint["model_state_dict"]
 
+    # torch.compile() wraps the model in OptimizedModule
+    state_dict = {
+        k.removeprefix("_orig_mod."): v for k, v in state_dict.items()
+    }
+
     n_layer = config.get("n_layer", 4)
     n_head = config.get("n_head", 4)
     dropout = config.get("dropout", 0.2)

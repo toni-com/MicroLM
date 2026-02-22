@@ -18,7 +18,7 @@ def read_train_args():
         default="roneneldan/TinyStories",
         help="Dataset name",
     )
-    parser.add_argument("--patience", required=False, type=int, default=4, help="Early stopping patience.")
+    parser.add_argument("--patience", required=False, type=int, default=3, help="Early stopping patience.")
 
     args = parser.parse_args()
 
